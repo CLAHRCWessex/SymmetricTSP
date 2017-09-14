@@ -18,6 +18,7 @@ print(cities)
 print(meta)
 
 
+#test 
 print(cities[0], cities[1])
 dist = e.euclidean_distance(cities[0], cities[1])
 dist2 = e.euclidean_distance2(cities[0], cities[1])

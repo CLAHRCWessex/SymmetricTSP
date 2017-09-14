@@ -40,6 +40,7 @@ def euclidean_distance(city1, city2):
     return np.linalg.norm((city1-city2))
 
 
+
 def euclidean_distance2(city1, city2):
     """
     An alterantive way to calculate euc distance 
