@@ -3,17 +3,18 @@
 Encapsulates objective functions for TSP
 """
 
-import numpy as np
-
-def symmetric_tour_list(n_cities):
+def symmetric_tour_list(n_cities, start_index = 0):
     """
     Returns a numpy array representiung a symmetric tour of cities
     length = n_cities + 1
-    First and last cities are index 0 e.g. for 5 cities
+    First and last cities are index 'start_index' e.g. for
+    start_index = 0 then for 5 cities tour = 
     [0, 1, 2, 3, 4, 0]
     """
     tour = [x for x in range(n_cities)]
-    tour.append(0)
+    tour.remove(start_index)
+    tour.insert(0, start_index)
+    tour.append(start_index)
     return tour
     
 def tour_cost(tour, matrix):

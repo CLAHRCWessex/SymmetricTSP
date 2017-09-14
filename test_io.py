@@ -7,7 +7,6 @@ import tsp_io as io
 import euclidean as e
 import objective as o
 import init_solutions as init
-from random import shuffle
 
 import numpy as np
 
@@ -21,21 +20,33 @@ meta = io.read_meta_data(file_path, md_rows)
 print(cities)
 print(meta)
 
+#example of calculating a single euclidean distance
 dist = e.euclidean_distance(cities[0], cities[1])
-dist2 = e.euclidean_distance2(cities[0], cities[1])
+print(dist)
 
-print(dist, dist2)
-
+#generate matrix
 matrix = e.gen_matrix(cities)
 
+#output city matrix - to validate and use for manual calcs etc.
 np.savetxt(file_out, matrix, delimiter=",")
 
-tour = o.symmetric_tour_list(len(cities))
+#you can specify the start/end city index using
+#the optional parameter start_index.  Default index = 0
+tour = o.symmetric_tour_list(len(cities), 2) # city at index 2 is start/end
+# tour = o.symmetric_tour_list(len(cities)) #  for city 0
 
-#random initial symmetric tour
+print(tour)
+
+#randomise the cities apart from start/end
 tour = init.random_tour(tour)
+print("\n", tour)
+
 cost = o.tour_cost(tour, matrix)
 print(cost)
+
+
+
+
 
 
     
