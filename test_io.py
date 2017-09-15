@@ -8,6 +8,7 @@ import euclidean as e
 import objective as o
 import init_solutions as init
 from bruteforce import BruteForceSolver
+from local_search import OrdinaryDecent
 
 import numpy as np
 
@@ -61,7 +62,18 @@ solver = BruteForceSolver(tour, matrix)
 print("Enumerating...")
 solver.solve()
 
-print("\n** OUTPUT ***")
+print("\n** BRUTEFORCE OUTPUT ***")
+print("\nbest solutions:\t{0}".format(len(solver.best_solutions)))
+print("best cost:\t{0}".format(solver.best_cost))
+print("best solutions:")
+[print(s) for s in solver.best_solutions]
+
+#Local Search - Single Run of Ordinary Decent 
+solver = OrdinaryDecent(tour, matrix)
+print("Commencing Ordinary Decent...")
+solver.solve()
+
+print("\n** ORDINARY DECENT OUTPUT ***")
 print("\nbest solutions:\t{0}".format(len(solver.best_solutions)))
 print("best cost:\t{0}".format(solver.best_cost))
 print("best solutions:")
