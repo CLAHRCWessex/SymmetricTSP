@@ -7,6 +7,7 @@ import tsp_io as io
 import euclidean as e
 import objective as o
 import init_solutions as init
+from bruteforce import BruteForceSolver
 
 import numpy as np
 
@@ -43,6 +44,32 @@ print("\n", tour)
 
 cost = o.tour_cost(tour, matrix)
 print(cost)
+
+
+#Brute force example for small TSP problems
+
+#need somethign to produce "short tour from large".
+size_trim = 10 #note slow beyond 10
+base_city = tour[0]
+tour = tour[0:size_trim]  #select a subset of the big problem.
+tour.append(base_city)
+
+print("\n\n**Short tour\n{0}".format(tour))
+print("initial cost: {0}".format(o.tour_cost(tour, matrix)))
+
+solver = BruteForceSolver(tour, matrix)
+print("Enumerating...")
+solver.solve()
+
+print("\n** OUTPUT ***")
+print("\nbest solutions:\t{0}".format(len(solver.best_solutions)))
+print("best cost:\t{0}".format(solver.best_cost))
+print("best solutions:")
+[print(s) for s in solver.best_solutions]
+
+
+
+
 
 
 

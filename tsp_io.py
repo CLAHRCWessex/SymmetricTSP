@@ -3,6 +3,9 @@
 Provides simple functions for reading in TSP problems from known test problems.
 Text file format from TSPLib: https://www.iwr.uni-heidelberg.de/groups/comopt/software/TSPLIB95/
 Requires knowledge about the volumne of meta_data.
+
+Slight issue - numpy.loadtxt does not like EOF. This is what is in the tsp files
+my workaround is to delete EOF from the file!!
 """
 
 import numpy as np
