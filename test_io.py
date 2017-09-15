@@ -8,7 +8,7 @@ import euclidean as e
 import objective as o
 import init_solutions as init
 from bruteforce import BruteForceSolver
-from local_search import OrdinaryDecent
+from local_search import OrdinaryDecent, SteepestDecent
 
 import numpy as np
 
@@ -65,24 +65,39 @@ solver.solve()
 print("\n** BRUTEFORCE OUTPUT ***")
 print("\nbest solutions:\t{0}".format(len(solver.best_solutions)))
 print("best cost:\t{0}".format(solver.best_cost))
+cost1 = solver.best_cost
 print("best solutions:")
 [print(s) for s in solver.best_solutions]
 
 #Local Search - Single Run of Ordinary Decent 
 solver = OrdinaryDecent(tour, matrix)
-print("Commencing Ordinary Decent...")
+print("Commencing Local Search using Ordinary Decent...")
 solver.solve()
 
 print("\n** ORDINARY DECENT OUTPUT ***")
 print("\nbest solutions:\t{0}".format(len(solver.best_solutions)))
 print("best cost:\t{0}".format(solver.best_cost))
+cost2 = solver.best_cost
 print("best solutions:")
 [print(s) for s in solver.best_solutions]
 
+#Local Search - Single Run of Steepest Decent 
+solver = SteepestDecent(tour, matrix)
+print("Commencing Local Search using Steepest Decent...")
+solver.solve()
 
+print("\n** STEEPEST DECENT OUTPUT ***")
+print("\nbest solutions:\t{0}".format(len(solver.best_solutions)))
+print("best cost:\t{0}".format(solver.best_cost))
+cost3 = solver.best_cost
+print("best solutions:")
+[print(s) for s in solver.best_solutions]
 
-
-
+#Summary of methods
+print("\n** COST SUMMARY ***")
+print("\nBrute Force:\t\t{0}".format(cost1))
+print("Ordinary Decent:\t{0}".format(cost2))
+print("Steepest Decent:\t{0}".format(cost2))
 
 
 
