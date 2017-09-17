@@ -17,10 +17,13 @@ class OrdinaryDecent(object):
         @matrix = matrix of travel costs
         """
         self.matrix = matrix
-        self.solution = init_solution
-        self.best_solutions = [init_solution]
-        self.best_cost = tour_cost(self.solution, matrix)
-        
+        self.set_init_solution(init_solution)
+    
+    def set_init_solution(self, solution):  
+        self.solution = solution
+        self.best_solutions = [solution]
+        self.best_cost = tour_cost(self.solution, self.matrix)        
+    
     def solve(self):
         
         improvement = True
@@ -62,10 +65,12 @@ class SteepestDecent(object):
         @matrix = matrix of travel costs
         """
         self.matrix = matrix
-        self.solution = init_solution
-        #list of best solutions in case of multiple optima
-        self.best_solutions = [init_solution]
-        self.best_cost = tour_cost(self.solution, matrix)
+        self.set_init_solution(init_solution)
+        
+    def set_init_solution(self, solution):  
+        self.solution = solution
+        self.best_solutions = [solution]
+        self.best_cost = tour_cost(self.solution, self.matrix)     
         
     def solve(self):
         
