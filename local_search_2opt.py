@@ -1,23 +1,40 @@
 # -*- coding: utf-8 -*-
 """
-Local search algorithms for TSP (a.k.a neighbourhood search)
-Implementations:
-1. Ordinary Search - find first improvement
+local search implemented with 2-opt swap
+
+2-opt = Switch 2 edges
+
+@author: Tom Monks
 """
 
 from objective import tour_cost
-from tsp_utility import append_base, trim_base
 
-class OrdinaryDecent(object):
+
+class LocalSearchArgs(object):
+    """
+    Argument class for local search classes
+    """
+    def __init__(self):
+        pass
     
-    def __init__(self, init_solution, matrix):
+    
+class OrdinaryDecent2Opt(object):
+    """
+    
+    Local (neighbourhood) search implemented as first improvement 
+    with 2-opt swaps
+    
+    """   
+    def __init__(self, args):
         """
         Constructor Method
         @init_solution = initial tour
         @matrix = matrix of travel costs
         """
-        self.matrix = matrix
-        self.set_init_solution(init_solution)
+        self.matrix = args.matrix
+        self.set_init_solution(args.init_solution)
+        #self.swapper = args.swapper
+        
     
     def set_init_solution(self, solution):  
         self.solution = solution
@@ -25,17 +42,23 @@ class OrdinaryDecent(object):
         self.best_cost = tour_cost(self.solution, self.matrix)        
     
     def solve(self):
-        
+        """
+        Run solution algoritm.
+        Note: algorithm is the same as ordinary decent
+        where 2 customers are swapped apare from call to swap 
+        code.  Can I encapsulate the swap code so that it can be reused?
+        """
         improvement = True
         
         while(improvement):
             improvement = False
             
             for city1 in range(1, len(self.solution) - 1):
-                
+                #print("city1: {0}".format(city1))
                 for city2 in range(city1 + 1, len(self.solution) - 1):
+                    #print("city2: {0}".format(city2))
                     
-                    self.swap_cities(city1, city2)
+                    self.reverse_sublist(self.solution, city1, city2)
                     
                     new_cost = tour_cost(self.solution, self.matrix)
                     
@@ -47,25 +70,37 @@ class OrdinaryDecent(object):
                         self.best_solutions = [self.solution]
                         improvement = True
                     else:
-                        self.swap_cities(city1, city2)
+                        self.reverse_sublist(self.solution, city1, city2)
                         
-                        
+                 
+                    
+    def reverse_sublist(self, lst, start, end):
+        """
+        Reverse a slice of the @lst elements between
+        @start and @end
+        """
+        lst[start:end+1] = reversed(lst[start:end+1])
+        return lst
 
-                    
-    def swap_cities(self, city1, city2):
-        self.solution[city1], self.solution[city2] = \
-            self.solution[city2], self.solution[city1]
-        
-                    
-class SteepestDecent(object):
-    def __init__(self, init_solution, matrix):
+
+                   
+    
+
+class SteepestDecent2Opt(object):
+    """
+    
+    Local (neighbourhood) search implemented as steepest decent
+    with 2-opt swaps
+    
+    """   
+    def __init__(self, args):
         """
         Constructor Method
         @init_solution = initial tour
         @matrix = matrix of travel costs
         """
-        self.matrix = matrix
-        self.set_init_solution(init_solution)
+        self.matrix = args.matrix
+        self.set_init_solution(args.init_solution)
         
     def set_init_solution(self, solution):  
         self.solution = solution
@@ -85,7 +120,7 @@ class SteepestDecent(object):
                 
                 for city2 in range(city1 + 1, len(self.solution) - 1):
                     
-                    self.swap_cities(city1, city2)
+                    self.reverse_sublist(self.solution, city1, city2)
                     
                     new_cost = tour_cost(self.solution, self.matrix)
                     
@@ -95,9 +130,9 @@ class SteepestDecent(object):
                         best_swap_city2 = city2
                         improvement = True
                     
-                    self.swap_cities(city1, city2)
+                    self.reverse_sublist(self.solution, city1, city2)
             
-            self.swap_cities(best_swap_city1, best_swap_city2)
+            self.reverse_sublist(self.solution, best_swap_city1, best_swap_city2)
             self.best_solutions = [self.solution]
             best_swap_city1 = 0
             best_swap_city2 = 0
@@ -105,9 +140,10 @@ class SteepestDecent(object):
                         
 
                     
-    def swap_cities(self, city1, city2):
-        self.solution[city1], self.solution[city2] = \
-            self.solution[city2], self.solution[city1]
-    
-    
-    
+    def reverse_sublist(self, lst, start, end):
+        """
+        Reverse a slice of the @lst elements between
+        @start and @end
+        """
+        lst[start:end+1] = reversed(lst[start:end+1])
+        return lst
