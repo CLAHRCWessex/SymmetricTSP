@@ -20,6 +20,7 @@ Solution methods included:
 5. Nearest Neighbour - Greedy Contruction heuristic - starting from base add teh nearest city (terrible performance!)
 6. OrdinaryDecent2Opt - first improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
 7. SteepestDecent2Opt - best improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
+8. FurthestInsertion - Construction heuristic. Bites the bullet early and adds in furthest points.
 
 All of these are tested in test.io.py
 Look at test_io to see how to use each of the algorithms (easy setup for all)

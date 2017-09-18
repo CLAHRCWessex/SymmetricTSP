@@ -11,7 +11,7 @@ from bruteforce import BruteForceSolver
 from local_search import OrdinaryDecent, SteepestDecent
 from multi_runner import MultiRunner
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs
-from construction import NearestNeighbour
+from construction import NearestNeighbour, FurthestInsertion
 
 import numpy as np
 
@@ -75,7 +75,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 11 #note bruteforce is slow beyond 10
+size_trim = 12 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -117,7 +117,7 @@ cost3 = solver.best_cost
 
 #Local Search - multiple runs of Ordinary Decent 
 runner = MultiRunner(OrdinaryDecent(tour, matrix))
-n = 5
+n = 10
 print("\nRunning Local Search using Ordinary Decent (Best of {} runs)..."\
       .format(n))
 runner.run(n)
@@ -189,7 +189,17 @@ print("\n** ORDINARY DECENT 2 Opt OUTPUT ***")
 print_output(solver)
 cost9 = solver.best_cost
 
+#Construction Heuristic - Furthest insertion
+solver = FurthestInsertion(tour, matrix)
+print("\nRunning Furthest Insertion alg...")
+solver.solve()
 
+print("\n** FURTHEST INSERTION OUTPUT ***")
+print("\nbest solutions:\t{0}".format(1))
+print("best cost:\t{0}".format(solver.best_cost))
+cost10 = solver.best_cost
+print("best solutions:")
+print(solver.best_solution)
 
 
     
@@ -206,5 +216,6 @@ print("Nearest Neighbour:\t\t{0}\t{1}".format(cost6, mark_optimal(cost1, cost6))
 print("Ordinary Decent NN init:\t{0}\t{1}".format(cost7, mark_optimal(cost1, cost7)))
 print("Ordinary Decent 2-Opt\t\t{0}\t{1}".format(cost8, mark_optimal(cost1, cost8)))
 print("Steepest Decent 2-Opt\t\t{0}\t{1}".format(cost9,mark_optimal(cost1, cost9)))
+print("Furthest Insertion:\t\t{0}\t{1}".format(cost10, mark_optimal(cost1, cost10)))
 
 print("\n*Optimal")
