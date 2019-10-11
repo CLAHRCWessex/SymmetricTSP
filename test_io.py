@@ -12,6 +12,8 @@ from local_search import OrdinaryDecent, SteepestDecent
 from multi_runner import MultiRunner
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs
 from construction import NearestNeighbour, FurthestInsertion
+from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
+                          TwoCityMutator)
 
 import numpy as np
 
@@ -38,8 +40,8 @@ def print_multi_run(solver):
     
     
 
-file_path = "Data\st70.tsp"
-file_out = "Data\matrix.csv"
+file_path = "Data/st70.tsp"
+file_out = "Data/matrix.csv"
 md_rows = 6
 
 cities = io.read_coordinates(file_path, md_rows)
@@ -64,7 +66,6 @@ tour = o.symmetric_tour_list(len(cities), 2) # city at index 2 is start/end
 # tour = o.symmetric_tour_list(len(cities)) #  for city 0
 
 print(tour)
-
 #randomise the cities apart from start/end
 tour = init.random_tour(tour)
 print("\n", tour)
@@ -75,7 +76,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 12 #note bruteforce is slow beyond 10
+size_trim = 8 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -195,9 +196,23 @@ print("\nRunning Furthest Insertion alg...")
 solver.solve()
 
 print("\n** FURTHEST INSERTION OUTPUT ***")
-print("\nbest solutions:\t{0}".format(1))
 print("best cost:\t{0}".format(solver.best_cost))
 cost10 = solver.best_cost
+print("best solutions:")
+print(solver.best_solution)
+
+
+#Evolutionary Algorithm - (mew, lambda) strategy
+mew = 5
+_lambda = 10
+strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
+print("\nRunning (mew, lambda) evolutionary alg...")
+solver.solve()
+
+print("\n** (MEW, LAMBDA) OUTPUT ***")
+print("best cost:\t{0}".format(solver.best_cost))
+cost11 = solver.best_cost
 print("best solutions:")
 print(solver.best_solution)
 
@@ -217,5 +232,6 @@ print("Ordinary Decent NN init:\t{0}\t{1}".format(cost7, mark_optimal(cost1, cos
 print("Ordinary Decent 2-Opt\t\t{0}\t{1}".format(cost8, mark_optimal(cost1, cost8)))
 print("Steepest Decent 2-Opt\t\t{0}\t{1}".format(cost9,mark_optimal(cost1, cost9)))
 print("Furthest Insertion:\t\t{0}\t{1}".format(cost10, mark_optimal(cost1, cost10)))
+print("Mew Lambda Evolution:\t\t{0}\t{1}".format(cost11, mark_optimal(cost1, cost11)))
 
 print("\n*Optimal")

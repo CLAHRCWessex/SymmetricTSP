@@ -3,6 +3,8 @@
 Encapsulates objective functions for TSP
 """
 
+import numpy as np
+
 def symmetric_tour_list(n_cities, start_index = 0):
     """
     Returns a numpy array representiung a symmetric tour of cities
