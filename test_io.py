@@ -13,7 +13,8 @@ from multi_runner import MultiRunner
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs
 from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
-                          MewPlusLambdaEvolutionStrategy, TwoCityMutator)
+                          MewPlusLambdaEvolutionStrategy, 
+                          TwoOptMutator, TwoCityMutator)
 
 import numpy as np
 
@@ -76,7 +77,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 8 #note bruteforce is slow beyond 10
+size_trim = 13 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -206,7 +207,7 @@ print(solver.best_solution)
 mew = 5
 _lambda = 10
 strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, max_iter=5000)
 print("\nRunning (mew, lambda) evolutionary alg...")
 solver.solve()
 
@@ -218,21 +219,35 @@ print(solver.best_solution)
 
 
 #Evolutionary Algorithm - (mew+lambda) strategy
-mew = 5
+mew = 3
 _lambda = 10
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
 print("\nRunning (mew + lambda) evolutionary alg...")
 solver.solve()
 
-print("\n** (MEW, LAMBDA) OUTPUT ***")
+print("\n** (MEW+LAMBDA) OUTPUT ***")
 print("best cost:\t{0}".format(solver.best_cost))
 cost12 = solver.best_cost
 print("best solutions:")
 print(solver.best_solution)
 
 
-    
+#Evolutionary Algorithm - (mew+lambda) strategy, TwoOpt Mutation
+mew = 3
+_lambda = 10
+strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoOptMutator())
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
+print("\nRunning (mew + lambda) evolutionary alg with 2-Opt...")
+solver.solve()
+
+print("\n** (MEW+LAMBDA) OUTPUT ***")
+print("best cost:\t{0}".format(solver.best_cost))
+cost13 = solver.best_cost
+print("best solutions:")
+print(solver.best_solution)
+
+
 #Summary of methods
 print("\n** COST SUMMARY ***")
 
@@ -249,5 +264,5 @@ print("Steepest Decent 2-Opt\t\t{0}\t{1}".format(cost9,mark_optimal(cost1, cost9
 print("Furthest Insertion:\t\t{0}\t{1}".format(cost10, mark_optimal(cost1, cost10)))
 print("EA: (Mew, Lambda) \t\t{0}\t{1}".format(cost11, mark_optimal(cost1, cost11)))
 print("EA: (Mew+Lambda) \t\t{0}\t{1}".format(cost12, mark_optimal(cost1, cost12)))
-
+print("EA: (Mew+Lambda)+2Opt \t\t{0}\t{1}".format(cost13, mark_optimal(cost1, cost13)))
 print("\n*Optimal")

@@ -59,6 +59,38 @@ class TwoCityMutator(object):
         return tour
 
 
+class TwoOptMutator(object):
+    '''
+    Mutates an individual tour by
+    randomly swapping two cities.
+    '''
+    def mutate(self, tour):
+        '''
+        Randomly reverse a section of the route
+        
+        Parameters:
+        --------
+        tour, np.array, tour
+
+        '''
+        #remember that index 0 and len(tour) are start/end city
+        to_swap = np.random.randint(1, len(tour) - 1, 2)
+
+        if to_swap[1] < to_swap[0]:
+            to_swap[0], to_swap[1] = to_swap[1], to_swap[0]
+
+        return self._reverse_sublist(tour, to_swap[0], to_swap[1])
+
+
+    def _reverse_sublist(self, lst, start, end):
+        """
+        Reverse a slice of the @lst elements between
+        @start and @end
+        """
+        lst[start:end] = lst[start:end][::-1]
+        return lst
+
+
 class AbstractTourMutator(ABC):
     @abstractmethod
     def mutate(self, tour):
