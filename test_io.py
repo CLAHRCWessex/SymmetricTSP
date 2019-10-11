@@ -13,7 +13,7 @@ from multi_runner import MultiRunner
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs
 from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
-                          TwoCityMutator)
+                          MewPlusLambdaEvolutionStrategy, TwoCityMutator)
 
 import numpy as np
 
@@ -217,6 +217,21 @@ print("best solutions:")
 print(solver.best_solution)
 
 
+#Evolutionary Algorithm - (mew+lambda) strategy
+mew = 5
+_lambda = 10
+strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
+print("\nRunning (mew + lambda) evolutionary alg...")
+solver.solve()
+
+print("\n** (MEW, LAMBDA) OUTPUT ***")
+print("best cost:\t{0}".format(solver.best_cost))
+cost12 = solver.best_cost
+print("best solutions:")
+print(solver.best_solution)
+
+
     
 #Summary of methods
 print("\n** COST SUMMARY ***")
@@ -232,6 +247,7 @@ print("Ordinary Decent NN init:\t{0}\t{1}".format(cost7, mark_optimal(cost1, cos
 print("Ordinary Decent 2-Opt\t\t{0}\t{1}".format(cost8, mark_optimal(cost1, cost8)))
 print("Steepest Decent 2-Opt\t\t{0}\t{1}".format(cost9,mark_optimal(cost1, cost9)))
 print("Furthest Insertion:\t\t{0}\t{1}".format(cost10, mark_optimal(cost1, cost10)))
-print("Mew Lambda Evolution:\t\t{0}\t{1}".format(cost11, mark_optimal(cost1, cost11)))
+print("EA: (Mew, Lambda) \t\t{0}\t{1}".format(cost11, mark_optimal(cost1, cost11)))
+print("EA: (Mew+Lambda) \t\t{0}\t{1}".format(cost12, mark_optimal(cost1, cost12)))
 
 print("\n*Optimal")

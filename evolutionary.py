@@ -126,6 +126,64 @@ class MewLambdaEvolutionStrategy(object):
         return population
         
 
+class MewPlusLambdaEvolutionStrategy(object):
+    '''
+    The (mew+lambda) evolution strategy
+    The fittest mew of each generation
+    produces lambda/mew offspring each of which is
+    mutated.  The mew fittest parents compete with 
+    their offspring int he new generation.
+
+    The first generation is of size lambda.
+    The second generation is of size mew+lambda
+    '''
+    def __init__(self, mew, _lambda, mutator):
+        '''
+        Constructor
+
+        Parameters:
+        --------
+        mew -       int, controls how selectiveness the algorithm.  
+                    Low values of mew relative to _lambsa mean that only the best 
+                    breed in each generation and the algorithm becomes 
+                    more exploitative.
+
+        _lambda -   int, controls the size of each generation.
+
+        mutator -   AbstractTourMutator, encapsulates the logic of mutation for a tour
+        '''
+        self._mew = mew
+        self._lambda = _lambda
+        self._mutator = mutator
+
+    
+    def evolve(self, population, costs):
+        '''
+        Only mew fittest individual survice.
+        Each of these breed lambda/mew children who are mutations
+        of the parent.
+
+        Parameters:
+        --------
+        population -- list, of numpy arrays representing a generation of tours
+
+        Returns:
+        --------
+        list of numpy.arrays - a new generation of tours.
+        '''
+
+        fittest_indexes = np.argpartition(costs, self._mew)[:self._mew]
+        fittest = np.array(population)[fittest_indexes]
+
+        population = fittest.tolist()  #this is the difference from (mew, lambda)
+
+        for parent in fittest:
+            for child_n in range(int(self._lambda/self._mew)):
+                child = self._mutator.mutate(parent.copy())
+                population.append(child)
+
+        return population
+
 
 class EvolutionaryAlgorithm(object):
     '''
