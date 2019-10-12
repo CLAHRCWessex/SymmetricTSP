@@ -7,6 +7,7 @@ from tsp_utility import append_base, trim_base
 from init_solutions import random_tour
 
 
+
 def initiation_population(population_size, tour):
     '''
     Generate a list of @population_size tours.  Tours
@@ -19,7 +20,8 @@ def initiation_population(population_size, tour):
 
     Returns:
     ---------
-    List - a list of numpy arrays each of which is a unique tour.
+    np.array. matrix size = (population_size, len(tour)). Contains
+              the initial generation of tours
     '''
 
     population = {}
@@ -29,11 +31,17 @@ def initiation_population(population_size, tour):
         #lists instead of numpy arrays... to fix!
         new_tour = random_tour(tour)
 
+        #return data as
+        population_arr = np.full((population_size, len(tour)), -1, dtype=int)
+
         if str(new_tour) not in population:
             population[str(new_tour)] = np.array(new_tour)
         else:
             i = i - 1
-    return list(population.values())
+
+    population_arr[:,] = list(population.values())
+
+    return population_arr
     
 
 class TwoCityMutator(object):
@@ -265,7 +273,6 @@ class EvolutionaryAlgorithm(object):
 
     
                 
-
     def _fitness(self, population):
         costs = np.full(len(population), -1.0, dtype=float)
         for i in range(len(population)):
