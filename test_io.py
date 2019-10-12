@@ -17,6 +17,7 @@ from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy,
                           TwoOptMutator, TwoCityMutator)
 
 import numpy as np
+import random
 
 def mark_optimal(optimal_cost, cost):
     if(cost == optimal_cost):
@@ -38,7 +39,9 @@ def print_multi_run(solver):
     print("best solutions:")
     [print(s[0]) for s in solver.best_solutions]
     
-    
+#seed = 999
+#np.random.seed(seed)
+#random.seed(seed)
     
 
 file_path = "Data/st70.tsp"
@@ -77,7 +80,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 9 #note bruteforce is slow beyond 10
+size_trim = 8 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -130,7 +133,7 @@ cost4, solutions = runner.get_best_solutions()
 
 #Local Search - multiple runs of Steepest Decent 
 runner = MultiRunner(SteepestDecent(tour, matrix))
-print("\nRunning Local Search using Ordinary Decent (Best of {} runs)..."\
+print("\nRunning Local Search using Steepest Decent (Best of {} runs)..."\
       .format(n))
 runner.run(n)
 
@@ -184,7 +187,7 @@ args = LocalSearchArgs()
 args.init_solution = tour
 args.matrix = matrix
 solver = SteepestDecent2Opt(args)
-print("\nRunning Local Search using Ordinary Decent 2-Opt...")
+print("\nRunning Local Search using Steepest Decent 2-Opt...")
 solver.solve()
 
 print("\n** ORDINARY DECENT 2 Opt OUTPUT ***")
@@ -204,10 +207,10 @@ print(solver.best_solution)
 
 
 #Evolutionary Algorithm - (mew, lambda) strategy
-mew = 5
-_lambda = 10
+mew = 10
+_lambda = 200
 strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=5000)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=1000)
 print("\nRunning (mew, lambda) evolutionary alg...")
 solver.solve()
 
@@ -219,10 +222,10 @@ print(solver.best_solution)
 
 
 #Evolutionary Algorithm - (mew+lambda) strategy
-mew = 3
-_lambda = 10
+mew = 10
+_lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=1000)
 print("\nRunning (mew + lambda) evolutionary alg...")
 solver.solve()
 
@@ -234,10 +237,10 @@ print(solver.best_solution)
 
 
 #Evolutionary Algorithm - (mew+lambda) strategy, TwoOpt Mutation
-mew = 3
-_lambda = 10
+mew = 10
+_lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoOptMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=1000)
 print("\nRunning (mew + lambda) evolutionary alg with 2-Opt...")
 solver.solve()
 

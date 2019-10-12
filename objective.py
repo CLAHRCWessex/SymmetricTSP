@@ -18,7 +18,8 @@ def symmetric_tour_list(n_cities, start_index = 0):
     tour.insert(0, start_index)
     tour.append(start_index)
     return tour
-    
+
+
 def tour_cost(tour, matrix):
     """
     The total distance in the tour.

@@ -25,8 +25,9 @@ def initiation_population(population_size, tour):
     '''
 
     population = {}
-    for i in range(population_size):
-        
+    #for i in range(population_size):
+    i = 0
+    while i < population_size:
         #some code is legacy and uses python
         #lists instead of numpy arrays... to fix!
         new_tour = random_tour(tour)
@@ -36,8 +37,7 @@ def initiation_population(population_size, tour):
 
         if str(new_tour) not in population:
             population[str(new_tour)] = np.array(new_tour)
-        else:
-            i = i - 1
+            i = i + 1
 
     population_arr[:,] = list(population.values())
 
