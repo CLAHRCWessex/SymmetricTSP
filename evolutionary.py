@@ -227,7 +227,7 @@ class EvolutionaryAlgorithm(object):
         '''
         Parameters:
         ---------
-        n_cities    - int, the number of cities to visit
+        tour        - np.array, cities to visit
         matrix      - np.array, cost matrix travelling from city i to city j
         _lambda     - int, initial population size
         strategy    - AbstractEvolutionStrategy, evolution stratgy
