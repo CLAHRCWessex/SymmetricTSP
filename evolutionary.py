@@ -223,7 +223,7 @@ class EvolutionaryAlgorithm(object):
     with mutation at each generation.
     '''
     def __init__(self, tour, matrix, _lambda, 
-                 strategy, max_iter=1000):
+                 strategy, generations=1000):
         '''
         Parameters:
         ---------
@@ -231,10 +231,10 @@ class EvolutionaryAlgorithm(object):
         matrix      - np.array, cost matrix travelling from city i to city j
         _lambda     - int, initial population size
         strategy    - AbstractEvolutionStrategy, evolution stratgy
-        max_iter    - int, maximum number of iterations (default=1000)
+        generations - int, maximum number of generations  (default=1000)
         '''
         self._tour = tour
-        self._max_iter = max_iter
+        self._max_generations = generations
         self._matrix = matrix
         self._strategy = strategy
         self._lambda = _lambda
@@ -252,7 +252,7 @@ class EvolutionaryAlgorithm(object):
         population = initiation_population(self._lambda, self._tour)
         costs = None
     
-        for generation in range(self._max_iter):
+        for generation in range(self._max_generations):
             costs = self._fitness(population)
             
             min_index = np.argmin(costs)
