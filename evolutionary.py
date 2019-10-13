@@ -138,28 +138,36 @@ class MewLambdaEvolutionStrategy(object):
     
     def evolve(self, population, costs):
         '''
-        Only mew fittest individual survice.
+        Truncation selection - only mew fittest individuals survive.  
+        
         Each of these breed lambda/mew children who are mutations
         of the parent.
 
         Parameters:
         --------
-        population -- list, of numpy arrays representing a generation of tours
+        population -- numpy array, matrix representing a generation of tours
+                      size (lambda, len(tour))
+
+        costs -- numpy.array, vector, size lambda, representing the cost of the 
+                 tours in population
 
         Returns:
         --------
-        list of numpy.arrays - a new generation of tours.
+        numpy.array - matrix of new generation of tours, size (lambda, len(tour))
         '''
 
         fittest_indexes = np.argpartition(costs, self._mew)[:self._mew]
-        fittest = np.array(population)[fittest_indexes]
+        fittest = population[fittest_indexes]
 
-        population = []
+        population = np.full((self._lambda, fittest[0].shape[0]),
+                             fill_value=-1, dtype=int)
 
+        index = 0
         for parent in fittest:
             for child_n in range(int(self._lambda/self._mew)):
                 child = self._mutator.mutate(parent.copy())
-                population.append(child)
+                population[index] = child
+                index += 1
 
         return population
         
@@ -203,11 +211,15 @@ class MewPlusLambdaEvolutionStrategy(object):
 
         Parameters:
         --------
-        population -- list, of numpy arrays representing a generation of tours
+        population -- numpy array, matrix representing a generation of tours
+                      size (lambda+mew, len(tour))
+
+        costs -- numpy.array, vector, size lambda, representing the cost of the 
+                 tours in population
 
         Returns:
         --------
-        list of numpy.arrays - a new generation of tours.
+        numpy.arrays - matric a new generation of tours, size (lambda+mew, len(tour))
         '''
 
         fittest_indexes = np.argpartition(costs, self._mew)[:self._mew]
