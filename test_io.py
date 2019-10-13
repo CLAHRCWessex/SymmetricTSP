@@ -7,7 +7,7 @@ import tsp_io as io
 import euclidean as e
 import objective as o
 import init_solutions as init
-from bruteforce import BruteForceSolver
+from bruteforce import BruteForceSolver, RandomSearch
 from local_search import OrdinaryDecent, SteepestDecent
 from multi_runner import MultiRunner
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs
@@ -80,7 +80,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 8 #note bruteforce is slow beyond 10
+size_trim = 9 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -97,6 +97,16 @@ solver.solve()
 print("\n** BRUTEFORCE OUTPUT ***")
 print_output(solver)
 cost1 = solver.best_cost
+
+
+solver = RandomSearch(tour, matrix, max_iter=10000)
+print("Searching...")
+#for size_trim 10 = 2.2s per loop
+solver.solve()
+
+print("\n** RANDOMSEARCH OUTPUT ***")
+print_output(solver)
+cost1a = solver.best_cost
 
 
 #Local Search - Single Run of Ordinary Decent 
@@ -256,6 +266,7 @@ print("\n** COST SUMMARY ***")
 
 
 print("\nBrute Force:\t\t\t{0}".format(cost1))
+print("Random Search:\t\t\t{0}\t{1}".format(cost1a, mark_optimal(cost1, cost1a)))
 print("Ordinary Decent:\t\t{0}\t{1}".format(cost2, mark_optimal(cost1, cost2)))
 print("Steepest Decent:\t\t{0}\t{1}".format(cost3, mark_optimal(cost1, cost3)))
 print("Ordinary Decent ({0} runs):\t{1}\t{2}".format(n, cost4, mark_optimal(cost1, cost4)))
