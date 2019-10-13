@@ -6,6 +6,16 @@ from objective import tour_cost, symmetric_tour_list
 from tsp_utility import append_base, trim_base
 from init_solutions import random_tour
 
+class AbstractMutator(ABC):
+    @abstractmethod
+    def mutate(self, individual):
+        pass
+
+class AbstractEvolutionStrategy(ABC):
+    @abstractmethod
+    def evolve(self, population, costs):
+        pass
+
 def initiation_population(population_size, tour):
     '''
     Generate a list of @population_size tours.  Tours
@@ -42,7 +52,7 @@ def initiation_population(population_size, tour):
     return population_arr
     
 
-class TwoCityMutator(object):
+class TwoCityMutator(AbstractMutator):
     '''
     Mutates an individual tour by
     randomly swapping two cities.
@@ -65,7 +75,7 @@ class TwoCityMutator(object):
         return tour
 
 
-class TwoOptMutator(object):
+class TwoOptMutator(AbstractMutator):
     '''
     Mutates an individual tour by
     randomly swapping two cities.
@@ -97,15 +107,10 @@ class TwoOptMutator(object):
         return lst
 
 
-class AbstractTourMutator(ABC):
-    @abstractmethod
-    def mutate(self, tour):
-        pass
 
-class AbstractEvolutionStrategy(ABC):
-    @abstractmethod
-    def evolve(self, population, costs):
-        pass
+
+
+
 
 class MewLambdaEvolutionStrategy(object):
     '''
