@@ -156,7 +156,7 @@ class MewLambdaEvolutionStrategy(object):
         numpy.array - matrix of new generation of tours, size (lambda, len(tour))
         '''
 
-        fittest_indexes = np.argpartition(costs, self._mew)[:self._mew]
+        fittest_indexes = np.argpartition(costs, costs.size - self._mew)[-self._mew:]
         fittest = population[fittest_indexes]
 
         population = np.full((self._lambda, fittest[0].shape[0]),
@@ -222,7 +222,7 @@ class MewPlusLambdaEvolutionStrategy(object):
         numpy.arrays - matric a new generation of tours, size (lambda+mew, len(tour))
         '''
 
-        fittest_indexes = np.argpartition(costs, self._mew)[:self._mew]
+        fittest_indexes = np.argpartition(costs, costs.size - self._mew)[-self._mew:]
         fittest = population[fittest_indexes]
         
         #this is the difference from (mew, lambda)
@@ -250,7 +250,7 @@ class EvolutionaryAlgorithm(object):
     with mutation at each generation.
     '''
     def __init__(self, tour, matrix, _lambda, 
-                 strategy, generations=1000):
+                 strategy, maximisation=True, generations=1000):
         '''
         Parameters:
         ---------
@@ -258,6 +258,8 @@ class EvolutionaryAlgorithm(object):
         matrix      - np.array, cost matrix travelling from city i to city j
         _lambda     - int, initial population size
         strategy    - AbstractEvolutionStrategy, evolution stratgy
+        maximisation- bool, True if the objective is a maximisation and 
+                      False if objective is minimisation (default=True)
         generations - int, maximum number of generations  (default=1000)
         '''
         self._tour = tour
@@ -267,12 +269,17 @@ class EvolutionaryAlgorithm(object):
         self._lambda = _lambda
         self._best = None
         self._best_cost = np.inf
+        
+        if maximisation:
+            self._negate = 1
+        else:
+            self._negate = -1
 
     def _get_best(self):
         return self._best
     
     def _get_best_cost(self):
-        return self._best_cost
+        return self._best_cost * self._negate
 
     def solve(self):
 
@@ -282,11 +289,11 @@ class EvolutionaryAlgorithm(object):
         for generation in range(self._max_generations):
             costs = self._fitness(population)
             
-            min_index = np.argmin(costs)
+            max_index = np.argmax(costs)
 
-            if self._best is None or (costs[min_index] < self._best_cost):
-                self._best = population[min_index]
-                self._best_cost = costs[min_index]
+            if self._best is None or (costs[max_index] > self._best_cost):
+                self._best = population[max_index]
+                self._best_cost = costs[max_index]
             
             population = self._strategy.evolve(population, costs)
 
@@ -298,7 +305,7 @@ class EvolutionaryAlgorithm(object):
             
             costs[i] = tour_cost(population[i], self._matrix)
 
-        return costs
+        return costs * self._negate
             
     best_solution = property(_get_best)
     best_cost = property(_get_best_cost)

@@ -80,7 +80,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 9 #note bruteforce is slow beyond 10
+size_trim = 8 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -220,7 +220,8 @@ print(solver.best_solution)
 mew = 10
 _lambda = 200
 strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=1000)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
+                               maximisation=False, generations=1000)
 print("\nRunning (mew, lambda) evolutionary alg...")
 solver.solve()
 
@@ -235,7 +236,8 @@ print(solver.best_solution)
 mew = 10
 _lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=1000)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
+                               maximisation=False, generations=1000)
 print("\nRunning (mew + lambda) evolutionary alg...")
 solver.solve()
 
@@ -250,7 +252,8 @@ print(solver.best_solution)
 mew = 10
 _lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoOptMutator())
-solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, generations=1000)
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
+                               maximisation=False, generations=1000)
 print("\nRunning (mew + lambda) evolutionary alg with 2-Opt...")
 solver.solve()
 
