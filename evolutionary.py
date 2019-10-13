@@ -16,6 +16,55 @@ class AbstractEvolutionStrategy(ABC):
     def evolve(self, population, costs):
         pass
 
+class AbstractSelectorWithReplacement(ABC):
+    @abstractmethod
+    def select(self, population):
+        pass
+
+class TournamentSelector(AbstractSelectorWithReplacement):
+    '''
+    Encapsulates a popular GA selection algorithm called
+    Tournament Selection.  An individual is selected at random
+    (with replacement) as the best from the population and competes against
+    a randomly selected (with replacement) challenger.  If the individual is
+    victorious they compete in the next round.  If the challenger is successful
+    they become the best and are carried forward to the next round. This is repeated
+    for t rounds.  Higher values of t are more selective.  
+    '''
+    def __init__(self, fitness_func, tournament_size=2):
+        '''
+        Constructor
+
+        Parameters:
+        ---------
+        tournament_size, int, must be >=1, (default=2)
+        '''
+        if tournament_size < 1:
+            raise ValueError('tournamant size must int be >= 1')
+        
+        self._fitness_func = fitness_func
+        self._tournament_size = tournament_size
+        
+    def select(self, population):
+        '''
+        Select individual from population for breeding using
+        a tournament approach.  t tournaments are conducted.
+        '''
+        best = population[np.random.randint(0, population.shape[0])]
+        best_cost = self._fitness_func(best)
+
+        for i in range(2, self.__tournament_size + 1):
+            challenger = population[np.random.randint(0, population.shape[0])]
+            challenger_cost = self._fitness_func(challenger)
+
+            if challenger_cost > best_cost:
+                best = challenger
+                best_cost = challenger
+
+        return best
+            
+
+
 def initiation_population(population_size, tour):
     '''
     Generate a list of @population_size tours.  Tours
