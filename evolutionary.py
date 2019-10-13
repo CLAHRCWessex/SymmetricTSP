@@ -6,8 +6,6 @@ from objective import tour_cost, symmetric_tour_list
 from tsp_utility import append_base, trim_base
 from init_solutions import random_tour
 
-
-
 def initiation_population(population_size, tour):
     '''
     Generate a list of @population_size tours.  Tours
@@ -213,16 +211,25 @@ class MewPlusLambdaEvolutionStrategy(object):
         '''
 
         fittest_indexes = np.argpartition(costs, self._mew)[:self._mew]
-        fittest = np.array(population)[fittest_indexes]
+        fittest = population[fittest_indexes]
+        
+        #this is the difference from (mew, lambda)
+        population = np.full((self._lambda+self._mew, fittest[0].shape[0]),
+                             0, dtype=int)
 
-        population = fittest.tolist()  #this is the difference from (mew, lambda)
-
-        for parent in fittest:
+        population[:len(fittest),] = fittest
+    
+        index = self._mew
+        for parent in range(len(fittest)):
             for child_n in range(int(self._lambda/self._mew)):
-                child = self._mutator.mutate(parent.copy())
-                population.append(child)
+                child = self._mutator.mutate(fittest[parent].copy())
+                population[index] = child
+                index += 1
 
         return population
+
+
+
 
 
 class EvolutionaryAlgorithm(object):
