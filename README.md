@@ -14,13 +14,19 @@ find the tour that visits each city exactly once and minimises the total distanc
 Solution methods included:
 
 1. BruteForceSolver - enumerate all solutions.  Inefficient, but useful for small instance testing.
-2. OrdinarySearch - first improvement neighbourhood search - swaps two cities at a time
-3. SteepestImprovement - best improvement neighbourhood search for best swap of two cities
-4. MultipleRunner - runs any local search alg n times with a different rnd initial tour.  Selected best tour from n.
-5. Nearest Neighbour - Greedy Contruction heuristic - starting from base add teh nearest city (terrible performance!)
-6. OrdinaryDecent2Opt - first improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
-7. SteepestDecent2Opt - best improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
-8. FurthestInsertion - Construction heuristic. Bites the bullet early and adds in furthest points.
+2. RandomSearch - a random tournament of solutions.  
+3. OrdinarySearch - first improvement neighbourhood search - swaps two cities at a time
+4. SteepestImprovement - best improvement neighbourhood search for best swap of two cities
+5. MultipleRunner - runs any local search alg n times with a different rnd initial tour.  Selected best tour from n.
+6. Nearest Neighbour - Greedy Contruction heuristic - starting from base add teh nearest city (terrible performance!)
+7. OrdinaryDecent2Opt - first improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
+8. SteepestDecent2Opt - best improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
+9. FurthestInsertion - Construction heuristic. Bites the bullet early and adds in furthest points.
+10. EvolutionaryAlgorithm - A family of evolutionary algorithm strategies
+    10a. MewLambdaEvolutionStrategy - Uses Truncation Selection to select the best Mew individuals in a population of solutions (of size Lambda) and mutate them. Mutation can be 2 city swap or 2-Opt.  
+    10b  MewPlusLambdaEvolutionStrategy- Uses Truncation Selection to select the best Mew individuals in a population (of size Lambda) and mutate them. The Mew fittest are introduced in the next generation to compete against children.  Each generation is of size mew+lambda.  Mutation can be 2 city swap or 2-Opt. 
+    10c. GeneticAlgorithmStrategy - Uses selection with replacement to crossover individual chromosomes
+    in a population and mutate them.  
 
 All of these are tested in test.io.py
 Look at test_io to see how to use each of the algorithms (easy setup for all)
