@@ -14,8 +14,9 @@ from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearc
 from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
                           MewPlusLambdaEvolutionStrategy, 
+                          GeneticAlgorithmStrategy,
                           TwoOptMutator, TwoCityMutator,
-                          TruncationSelector)
+                          TruncationSelector, TournamentSelector, PartiallyMappedCrossover)
 
 import numpy as np
 import random
@@ -81,7 +82,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 8 #note bruteforce is slow beyond 10
+size_trim = 11 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -265,6 +266,28 @@ cost13 = solver.best_fitness
 print("best solutions:")
 print(solver.best_solution)
 
+#Evolutionary Algorithm - Genetic Algorithm strategy
+mew = 10
+_lambda = 200
+
+strategy = GeneticAlgorithmStrategy(_lambda, 
+                                    selector=TournamentSelector(),
+                                    xoperator=PartiallyMappedCrossover(),
+                                    mutator=TwoCityMutator())
+
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
+                               maximisation=False, generations=1000)
+print("\nRunning Genetic Algorithm")
+solver.solve()
+
+print("\n** GA OUTPUT ***")
+print("best cost:\t{0}".format(solver.best_fitness))
+cost14 = solver.best_fitness
+print("best solutions:")
+print(solver.best_solution)
+
+
+
 
 #Summary of methods
 print("\n** COST SUMMARY ***")
@@ -284,4 +307,5 @@ print("Furthest Insertion:\t\t{0}\t{1}".format(cost10, mark_optimal(cost1, cost1
 print("EA: (Mew, Lambda) \t\t{0}\t{1}".format(cost11, mark_optimal(cost1, cost11)))
 print("EA: (Mew+Lambda) \t\t{0}\t{1}".format(cost12, mark_optimal(cost1, cost12)))
 print("EA: (Mew+Lambda)+2Opt \t\t{0}\t{1}".format(cost13, mark_optimal(cost1, cost13)))
+print("Genetic Algorithm \t\t{0}\t{1}".format(cost14, mark_optimal(cost1, cost14)))
 print("\n*Optimal")

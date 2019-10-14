@@ -43,13 +43,13 @@ class PartiallyMappedCrossover(AbstractCrossoverOperator):
 
     def _pmx(self, child, parent_to_cross):
         x_indexes = np.sort(np.random.randint(0, len(child), size=2))
-        print(x_indexes)
-
-        for index in range(x_indexes[0], x_indexes[1]+1):
+        
+        for index in range(x_indexes[0], x_indexes[1]):
             city = parent_to_cross[index]
             swap_index = np.where(child == city)[0][0]
             child[index], child[swap_index] = child[swap_index], child[index]
 
+        child[-1:] = child[0]
         return child
             
 
@@ -203,6 +203,78 @@ class TwoOptMutator(AbstractMutator):
         lst[start:end] = lst[start:end][::-1]
         return lst
 
+
+class GeneticAlgorithmStrategy(AbstractEvolutionStrategy):
+    '''
+    The Genetic evolution
+    Individual chromosomes in the population
+    compete to cross over and breed children.  
+    Children are randomly mutated.
+
+    Each generation is of size lambda.
+    '''
+    def __init__(self, _lambda, selector, xoperator, mutator):
+        '''
+        Constructor
+
+        Parameters:
+        --------
+
+        _lambda -   int, controls the size of each generation. (make it even)
+
+        selector -  AbstractSelector, selects an individual chromosome for crossover
+
+        xoperator - AbstractCrossoverOperator, encapsulates the logic
+                    crossover two selected parents
+        
+        mutator -   AbstractMutator, encapsulates the logic of mutation for a 
+                    selected individual
+        '''
+ 
+        self._lambda = _lambda
+        self._selector = selector
+        self._xoperator = xoperator
+        self._mutator = mutator
+
+    
+    def evolve(self, population, fitness):
+        '''
+        Truncation selection - only mew fittest individuals survive.  
+        
+        Each of these breed lambda/mew children who are mutations
+        of the parent.
+
+        Parameters:
+        --------
+        population -- numpy array, matrix representing a generation of tours
+                      size (lambda, len(individual))
+
+        fitness --    numpy.array, vector, size lambda, representing the cost of the 
+                      tours in population
+
+        Returns:
+        --------
+        numpy.array - matrix of new generation, size (lambda, len(individual))
+        '''
+
+        next_gen = np.full((self._lambda, len(population[0])),
+                             fill_value=-1, dtype=np.byte)
+
+        index = 0
+        for crossover in range(int(self._lambda / 2)):
+            
+            parent_a = self._selector.select(population, fitness)
+            parent_b = self._selector.select(population, fitness)
+            
+            c_a, c_b = self._xoperator.crossover(parent_a, parent_b)
+           
+            self._mutator.mutate(c_a)
+            self._mutator.mutate(c_b)
+
+            next_gen[index], next_gen[index+1] = c_a, c_b
+            
+            index += 2
+        return next_gen
 
 
 class MewLambdaEvolutionStrategy(AbstractEvolutionStrategy):
@@ -397,6 +469,7 @@ class EvolutionaryAlgorithm(object):
                 self._best_fitness = fitness[max_index]
             
             population = self._strategy.evolve(population, fitness)
+            
 
     
     def _fitness(self, population):
