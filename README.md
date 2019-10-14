@@ -23,8 +23,11 @@ Solution methods included:
 8. SteepestDecent2Opt - best improvement neighbourhood search - 2 opt (edge) swap (reverse section of route)
 9. FurthestInsertion - Construction heuristic. Bites the bullet early and adds in furthest points.
 10. EvolutionaryAlgorithm - A family of evolutionary algorithm strategies
+
 10a. MewLambdaEvolutionStrategy - Uses Truncation Selection to select the best Mew individuals in a population of solutions (of size Lambda) and mutate them. Mutation can be 2 city swap or 2-Opt.  
+
 10b.  MewPlusLambdaEvolutionStrategy- Uses Truncation Selection to select the best Mew individuals in a population (of size Lambda) and mutate them. The Mew fittest are introduced in the next generation to compete against children.  Each generation is of size mew+lambda.  Mutation can be 2 city swap or 2-Opt. 
+
 10c. GeneticAlgorithmStrategy - Uses selection with replacement to crossover individual chromosomes in a population and mutate them.  
 
 All of these are tested in test.io.py
