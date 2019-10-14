@@ -102,7 +102,7 @@ def initiation_population(population_size, tour):
         new_tour = random_tour(tour)
 
         #return data as
-        population_arr = np.full((population_size, len(tour)), -1, dtype=int)
+        population_arr = np.full((population_size, len(tour)), -1, dtype=np.byte)
 
         if str(new_tour) not in population:
             population[str(new_tour)] = np.array(new_tour)
@@ -227,7 +227,7 @@ class MewLambdaEvolutionStrategy(AbstractEvolutionStrategy):
 
         fittest = self._selector.select(population, fitness)
         population = np.full((self._lambda, fittest[0].shape[0]),
-                             fill_value=-1, dtype=int)
+                             fill_value=-1, dtype=np.byte)
 
         index = 0
         for parent in fittest:
@@ -295,7 +295,7 @@ class MewPlusLambdaEvolutionStrategy(AbstractEvolutionStrategy):
         
         #this is the difference from (mew, lambda)
         population = np.full((self._lambda+self._mew, fittest[0].shape[0]),
-                             0, dtype=int)
+                             0, dtype=np.byte)
 
         population[:len(fittest),] = fittest
     
