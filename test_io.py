@@ -228,8 +228,8 @@ print("\nRunning (mew, lambda) evolutionary alg...")
 solver.solve()
 
 print("\n** (MEW, LAMBDA) OUTPUT ***")
-print("best cost:\t{0}".format(solver.best_cost))
-cost11 = solver.best_cost
+print("best cost:\t{0}".format(solver.best_fitness))
+cost11 = solver.best_fitness
 print("best solutions:")
 print(solver.best_solution)
 
@@ -244,8 +244,8 @@ print("\nRunning (mew + lambda) evolutionary alg...")
 solver.solve()
 
 print("\n** (MEW+LAMBDA) OUTPUT ***")
-print("best cost:\t{0}".format(solver.best_cost))
-cost12 = solver.best_cost
+print("best cost:\t{0}".format(solver.best_fitness))
+cost12 = solver.best_fitness
 print("best solutions:")
 print(solver.best_solution)
 
@@ -260,8 +260,8 @@ print("\nRunning (mew + lambda) evolutionary alg with 2-Opt...")
 solver.solve()
 
 print("\n** (MEW+LAMBDA) OUTPUT ***")
-print("best cost:\t{0}".format(solver.best_cost))
-cost13 = solver.best_cost
+print("best cost:\t{0}".format(solver.best_fitness))
+cost13 = solver.best_fitness
 print("best solutions:")
 print(solver.best_solution)
 

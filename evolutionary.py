@@ -13,12 +13,12 @@ class AbstractMutator(ABC):
 
 class AbstractEvolutionStrategy(ABC):
     @abstractmethod
-    def evolve(self, population, costs):
+    def evolve(self, population, fitness):
         pass
 
 class AbstractSelector(ABC):
     @abstractmethod
-    def select(self, population, costs):
+    def select(self, population, fitness):
         pass
 
 class TruncationSelector(AbstractSelector):
@@ -98,6 +98,7 @@ def initiation_population(population_size, tour):
     while i < population_size:
         #some code is legacy and uses python
         #lists instead of numpy arrays... to fix!
+        #the random tour bit varies between problem...
         new_tour = random_tour(tour)
 
         #return data as
@@ -116,6 +117,8 @@ class TwoCityMutator(AbstractMutator):
     '''
     Mutates an individual tour by
     randomly swapping two cities.
+
+    Designed to work with the TSP.
     '''
     def mutate(self, tour):
         '''
@@ -139,6 +142,8 @@ class TwoOptMutator(AbstractMutator):
     '''
     Mutates an individual tour by
     randomly swapping two cities.
+
+    Designed to work with the TSP
     '''
     def mutate(self, tour):
         '''
@@ -168,11 +173,7 @@ class TwoOptMutator(AbstractMutator):
 
 
 
-
-
-
-
-class MewLambdaEvolutionStrategy(object):
+class MewLambdaEvolutionStrategy(AbstractEvolutionStrategy):
     '''
     The (mew, lambda) evolution strategy
     The fittest mew of each generation
@@ -204,7 +205,7 @@ class MewLambdaEvolutionStrategy(object):
         self._mutator = mutator
 
     
-    def evolve(self, population, costs):
+    def evolve(self, population, fitness):
         '''
         Truncation selection - only mew fittest individuals survive.  
         
@@ -214,17 +215,17 @@ class MewLambdaEvolutionStrategy(object):
         Parameters:
         --------
         population -- numpy array, matrix representing a generation of tours
-                      size (lambda, len(tour))
+                      size (lambda, len(individual))
 
-        costs -- numpy.array, vector, size lambda, representing the cost of the 
-                 tours in population
+        fitness --    numpy.array, vector, size lambda, representing the cost of the 
+                      tours in population
 
         Returns:
         --------
-        numpy.array - matrix of new generation of tours, size (lambda, len(tour))
+        numpy.array - matrix of new generation, size (lambda, len(individual))
         '''
 
-        fittest = self._selector.select(population, costs)
+        fittest = self._selector.select(population, fitness)
         population = np.full((self._lambda, fittest[0].shape[0]),
                              fill_value=-1, dtype=int)
 
@@ -238,7 +239,7 @@ class MewLambdaEvolutionStrategy(object):
         return population
         
 
-class MewPlusLambdaEvolutionStrategy(object):
+class MewPlusLambdaEvolutionStrategy(AbstractEvolutionStrategy):
     '''
     The (mew+lambda) evolution strategy
     The fittest mew of each generation
@@ -270,7 +271,7 @@ class MewPlusLambdaEvolutionStrategy(object):
         self._selector = TruncationSelector(mew)
 
     
-    def evolve(self, population, costs):
+    def evolve(self, population, fitness):
         '''
         Only mew fittest individual survice.
         Each of these breed lambda/mew children who are mutations
@@ -281,15 +282,16 @@ class MewPlusLambdaEvolutionStrategy(object):
         population -- numpy array, matrix representing a generation of tours
                       size (lambda+mew, len(tour))
 
-        costs -- numpy.array, vector, size lambda, representing the cost of the 
-                 tours in population
+        fitness     -- numpy.array, vector, size lambda, representing the fitness of the 
+                       individuals in the population
 
         Returns:
         --------
-        numpy.arrays - matric a new generation of tours, size (lambda+mew, len(tour))
+        numpy.arrays - matric a new generation of individuals, 
+                       size (lambda+mew, len(individual))
         '''
 
-        fittest = self._selector.select(population, costs)
+        fittest = self._selector.select(population, fitness)
         
         #this is the difference from (mew, lambda)
         population = np.full((self._lambda+self._mew, fittest[0].shape[0]),
@@ -334,7 +336,7 @@ class EvolutionaryAlgorithm(object):
         self._strategy = strategy
         self._lambda = _lambda
         self._best = None
-        self._best_cost = np.inf
+        self._best_fitness = np.inf
         
         if maximisation:
             self._negate = 1
@@ -344,37 +346,37 @@ class EvolutionaryAlgorithm(object):
     def _get_best(self):
         return self._best
     
-    def _get_best_cost(self):
-        return self._best_cost * self._negate
+    def _get_best_fitness(self):
+        return self._best_fitness * self._negate
 
     def solve(self):
 
         population = initiation_population(self._lambda, self._tour)
-        costs = None
+        fitness = None
     
         for generation in range(self._max_generations):
-            costs = self._fitness(population)
+            fitness = self._fitness(population)
             
-            max_index = np.argmax(costs)
+            max_index = np.argmax(fitness)
 
-            if self._best is None or (costs[max_index] > self._best_cost):
+            if self._best is None or (fitness[max_index] > self._best_fitness):
                 self._best = population[max_index]
-                self._best_cost = costs[max_index]
+                self._best_fitness = fitness[max_index]
             
-            population = self._strategy.evolve(population, costs)
+            population = self._strategy.evolve(population, fitness)
 
     
-                
     def _fitness(self, population):
-        costs = np.full(len(population), -1.0, dtype=float)
+        fitness = np.full(len(population), -1.0, dtype=float)
         for i in range(len(population)):
             
-            costs[i] = tour_cost(population[i], self._matrix)
+            #specific to the TSP - needs to be encapsulated...
+            fitness[i] = tour_cost(population[i], self._matrix)
 
-        return costs * self._negate
+        return fitness * self._negate
             
     best_solution = property(_get_best)
-    best_cost = property(_get_best_cost)
+    best_fitness = property(_get_best_fitness)
 
 
 
