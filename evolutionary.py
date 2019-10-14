@@ -64,7 +64,6 @@ class TournamentSelector(AbstractSelector):
         best_index = np.random.randint(0, population.shape[0])
         best, best_fitness = population[best_index], fitness[best_index]
         
-
         for i in range(2, self._tournament_size + 1):
             challenger_index = np.random.randint(0, population.shape[0])
             challenger = population[challenger_index]
@@ -195,10 +194,13 @@ class MewLambdaEvolutionStrategy(object):
 
         _lambda -   int, controls the size of each generation.
 
-        mutator -   AbstractTourMutator, encapsulates the logic of mutation for a tour
+
+        mutator -   AbstractMutator, encapsulates the logic of mutation for a 
+                    selected individual
         '''
         self._mew = mew
         self._lambda = _lambda
+        self._selector = TruncationSelector(mew)
         self._mutator = mutator
 
     
@@ -222,9 +224,7 @@ class MewLambdaEvolutionStrategy(object):
         numpy.array - matrix of new generation of tours, size (lambda, len(tour))
         '''
 
-        fittest_indexes = np.argpartition(costs, costs.size - self._mew)[-self._mew:]
-        fittest = population[fittest_indexes]
-
+        fittest = self._selector.select(population, costs)
         population = np.full((self._lambda, fittest[0].shape[0]),
                              fill_value=-1, dtype=int)
 
@@ -262,11 +262,12 @@ class MewPlusLambdaEvolutionStrategy(object):
 
         _lambda -   int, controls the size of each generation.
 
-        mutator -   AbstractTourMutator, encapsulates the logic of mutation for a tour
+        mutator -   AbstractMutator, encapsulates the logic of mutation for an indiviudal
         '''
         self._mew = mew
         self._lambda = _lambda
         self._mutator = mutator
+        self._selector = TruncationSelector(mew)
 
     
     def evolve(self, population, costs):
@@ -288,8 +289,7 @@ class MewPlusLambdaEvolutionStrategy(object):
         numpy.arrays - matric a new generation of tours, size (lambda+mew, len(tour))
         '''
 
-        fittest_indexes = np.argpartition(costs, costs.size - self._mew)[-self._mew:]
-        fittest = population[fittest_indexes]
+        fittest = self._selector.select(population, costs)
         
         #this is the difference from (mew, lambda)
         population = np.full((self._lambda+self._mew, fittest[0].shape[0]),

@@ -14,7 +14,8 @@ from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearc
 from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
                           MewPlusLambdaEvolutionStrategy, 
-                          TwoOptMutator, TwoCityMutator)
+                          TwoOptMutator, TwoCityMutator,
+                          TruncationSelector)
 
 import numpy as np
 import random
@@ -219,6 +220,7 @@ print(solver.best_solution)
 #Evolutionary Algorithm - (mew, lambda) strategy
 mew = 10
 _lambda = 200
+
 strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
                                maximisation=False, generations=1000)
