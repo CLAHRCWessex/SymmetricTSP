@@ -16,12 +16,24 @@ class AbstractEvolutionStrategy(ABC):
     def evolve(self, population, costs):
         pass
 
-class AbstractSelectorWithReplacement(ABC):
+class AbstractSelector(ABC):
     @abstractmethod
-    def select(self, population):
+    def select(self, population, costs):
         pass
 
-class TournamentSelector(AbstractSelectorWithReplacement):
+class TruncationSelector(AbstractSelector):
+    '''
+    Simple truncation selection of the mew fittest 
+    individuals in the population
+    '''
+    def __init__(self, mew):
+        self._mew = mew
+
+    def select(self, population, fitness):
+        fittest_indexes = np.argpartition(fitness, fitness.size - self._mew)[-self._mew:]
+        return population[fittest_indexes]
+
+class TournamentSelector(AbstractSelector):
     '''
     Encapsulates a popular GA selection algorithm called
     Tournament Selection.  An individual is selected at random
@@ -31,7 +43,7 @@ class TournamentSelector(AbstractSelectorWithReplacement):
     they become the best and are carried forward to the next round. This is repeated
     for t rounds.  Higher values of t are more selective.  
     '''
-    def __init__(self, fitness_func, tournament_size=2):
+    def __init__(self, tournament_size=2):
         '''
         Constructor
 
@@ -42,24 +54,24 @@ class TournamentSelector(AbstractSelectorWithReplacement):
         if tournament_size < 1:
             raise ValueError('tournamant size must int be >= 1')
         
-        self._fitness_func = fitness_func
         self._tournament_size = tournament_size
         
-    def select(self, population):
+    def select(self, population, fitness):
         '''
         Select individual from population for breeding using
         a tournament approach.  t tournaments are conducted.
         '''
-        best = population[np.random.randint(0, population.shape[0])]
-        best_cost = self._fitness_func(best)
+        best_index = np.random.randint(0, population.shape[0])
+        best, best_fitness = population[best_index], fitness[best_index]
+        
 
-        for i in range(2, self.__tournament_size + 1):
-            challenger = population[np.random.randint(0, population.shape[0])]
-            challenger_cost = self._fitness_func(challenger)
-
-            if challenger_cost > best_cost:
+        for i in range(2, self._tournament_size + 1):
+            challenger_index = np.random.randint(0, population.shape[0])
+            challenger = population[challenger_index]
+            
+            if fitness[challenger_index] > best_fitness:
                 best = challenger
-                best_cost = challenger
+                best_fitness = fitness[challenger_index]
 
         return best
             
