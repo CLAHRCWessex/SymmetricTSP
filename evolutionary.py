@@ -105,6 +105,9 @@ class TournamentSelector(AbstractSelector):
                 best_fitness = fitness[challenger_index]
 
         return best
+
+
+
             
 
 
@@ -261,6 +264,87 @@ class GeneticAlgorithmStrategy(AbstractEvolutionStrategy):
                              fill_value=-1, dtype=np.byte)
 
         index = 0
+        for crossover in range(int(self._lambda / 2)):
+            
+            parent_a = self._selector.select(population, fitness)
+            parent_b = self._selector.select(population, fitness)
+            
+            c_a, c_b = self._xoperator.crossover(parent_a, parent_b)
+           
+            self._mutator.mutate(c_a)
+            self._mutator.mutate(c_b)
+
+            next_gen[index], next_gen[index+1] = c_a, c_b
+            
+            index += 2
+        return next_gen
+
+
+class ElitistGeneticAlgorithmStrategy(AbstractEvolutionStrategy):
+    '''
+    The Genetic evolution
+    Individual chromosomes in the population
+    compete to cross over and breed children.  
+    Children are randomly mutated.
+
+    Each generation is of size lambda.
+    '''
+    def __init__(self, mew, _lambda, selector, xoperator, mutator):
+        '''
+        Constructor
+
+        Parameters:
+        --------
+
+        _lambda -   int, controls the size of each generation. (make it even)
+
+        selector -  AbstractSelector, selects an individual chromosome for crossover
+
+        xoperator - AbstractCrossoverOperator, encapsulates the logic
+                    crossover two selected parents
+        
+        mutator -   AbstractMutator, encapsulates the logic of mutation for a 
+                    selected individual
+        '''
+ 
+        self._mew = mew
+        self._lambda = _lambda
+        self._selector = selector
+        self._xoperator = xoperator
+        self._mutator = mutator
+        self._trunc_selector = TruncationSelector(mew)
+
+    
+    def evolve(self, population, fitness):
+        '''
+        Truncation selection - only mew fittest individuals survive.  
+        
+        Each of these breed lambda/mew children who are mutations
+        of the parent.
+
+        Parameters:
+        --------
+        population -- numpy array, matrix representing a generation of tours
+                      size (lambda, len(individual))
+
+        fitness --    numpy.array, vector, size lambda, representing the cost of the 
+                      tours in population
+
+        Returns:
+        --------
+        numpy.array - matrix of new generation, size (lambda, len(individual))
+        '''
+
+        next_gen = np.full((self._mew + self._lambda, len(population[0])),
+                             fill_value=-1, dtype=np.byte)
+
+
+        #the n fittest chromosomes in the population (breaking ties at random)
+        #this is the difference from the standard GA strategy
+        fittest = self._trunc_selector.select(population, fitness)
+        next_gen[:len(fittest),] = fittest                     
+
+        index = self._mew
         for crossover in range(int(self._lambda / 2)):
             
             parent_a = self._selector.select(population, fitness)

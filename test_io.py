@@ -15,6 +15,7 @@ from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
                           MewPlusLambdaEvolutionStrategy, 
                           GeneticAlgorithmStrategy,
+                          ElitistGeneticAlgorithmStrategy,
                           TwoOptMutator, TwoCityMutator,
                           TruncationSelector, TournamentSelector, PartiallyMappedCrossover)
 
@@ -82,7 +83,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 11 #note bruteforce is slow beyond 10
+size_trim = 70 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -94,7 +95,7 @@ print("initial cost: {0}".format(o.tour_cost(tour, matrix)))
 solver = BruteForceSolver(tour, matrix)
 print("Enumerating...")
 #for size_trim 10 = 2.2s per loop
-solver.solve()
+#solver.solve()
 
 print("\n** BRUTEFORCE OUTPUT ***")
 print_output(solver)
@@ -206,6 +207,21 @@ print("\n** ORDINARY DECENT 2 Opt OUTPUT ***")
 print_output(solver)
 cost9 = solver.best_cost
 
+#Local Search - multiple runs of Ordinary Decent 2Opt
+args = LocalSearchArgs()
+args.init_solution = tour
+args.matrix = matrix
+runner = MultiRunner(OrdinaryDecent2Opt(args))
+n = 50
+print("\nRunning Local Search using Ordinary Decent 2-Opt (Best of {} runs)..."\
+      .format(n))
+runner.run(n)
+
+print("\n** MULTIPLE RUNS OF ORDINARY DECENT OUTPUT ***")
+print_multi_run(solver)
+cost9a, solutions = runner.get_best_solutions()
+
+
 #Construction Heuristic - Furthest insertion
 solver = FurthestInsertion(tour, matrix)
 print("\nRunning Furthest Insertion alg...")
@@ -224,7 +240,7 @@ _lambda = 200
 
 strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=2000)
 print("\nRunning (mew, lambda) evolutionary alg...")
 solver.solve()
 
@@ -240,7 +256,7 @@ mew = 10
 _lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=3000)
 print("\nRunning (mew + lambda) evolutionary alg...")
 solver.solve()
 
@@ -256,7 +272,7 @@ mew = 10
 _lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoOptMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=5000)
 print("\nRunning (mew + lambda) evolutionary alg with 2-Opt...")
 solver.solve()
 
@@ -267,7 +283,6 @@ print("best solutions:")
 print(solver.best_solution)
 
 #Evolutionary Algorithm - Genetic Algorithm strategy
-mew = 10
 _lambda = 200
 
 strategy = GeneticAlgorithmStrategy(_lambda, 
@@ -276,13 +291,55 @@ strategy = GeneticAlgorithmStrategy(_lambda,
                                     mutator=TwoCityMutator())
 
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=3000)
 print("\nRunning Genetic Algorithm")
 solver.solve()
 
 print("\n** GA OUTPUT ***")
 print("best cost:\t{0}".format(solver.best_fitness))
 cost14 = solver.best_fitness
+print("best solutions:")
+print(solver.best_solution)
+
+
+#Evolutionary Algorithm - Elitist Genetic Algorithm strategy
+mew = 10
+_lambda = 200
+
+strategy = ElitistGeneticAlgorithmStrategy(mew, _lambda, 
+                                           selector=TournamentSelector(),
+                                           xoperator=PartiallyMappedCrossover(),
+                                           mutator=TwoCityMutator())
+
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
+                               maximisation=False, generations=3000)
+print("\nRunning Elitist Genetic Algorithm")
+solver.solve()
+
+print("\n** GA OUTPUT ***")
+print("best cost:\t{0}".format(solver.best_fitness))
+cost15 = solver.best_fitness
+print("best solutions:")
+print(solver.best_solution)
+
+
+#Evolutionary Algorithm - Elitist Genetic Algorithm strategy - 2Opt
+mew = 10
+_lambda = 200
+
+strategy = ElitistGeneticAlgorithmStrategy(mew, _lambda, 
+                                           selector=TournamentSelector(),
+                                           xoperator=PartiallyMappedCrossover(),
+                                           mutator=TwoOptMutator())
+
+solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
+                               maximisation=False, generations=5000)
+print("\nRunning Elitist Genetic Algorithm - 2Opt")
+solver.solve()
+
+print("\n** GA OUTPUT ***")
+print("best cost:\t{0}".format(solver.best_fitness))
+cost16 = solver.best_fitness
 print("best solutions:")
 print(solver.best_solution)
 
@@ -303,9 +360,12 @@ print("Nearest Neighbour:\t\t{0}\t{1}".format(cost6, mark_optimal(cost1, cost6))
 print("Ordinary Decent NN init:\t{0}\t{1}".format(cost7, mark_optimal(cost1, cost7)))
 print("Ordinary Decent 2-Opt\t\t{0}\t{1}".format(cost8, mark_optimal(cost1, cost8)))
 print("Steepest Decent 2-Opt\t\t{0}\t{1}".format(cost9,mark_optimal(cost1, cost9)))
+print("Ord Decent 2-Opt ({0} runs):\t{1}\t{2}".format(n, cost9a, mark_optimal(cost1, cost9a)))
 print("Furthest Insertion:\t\t{0}\t{1}".format(cost10, mark_optimal(cost1, cost10)))
 print("EA: (Mew, Lambda) \t\t{0}\t{1}".format(cost11, mark_optimal(cost1, cost11)))
 print("EA: (Mew+Lambda) \t\t{0}\t{1}".format(cost12, mark_optimal(cost1, cost12)))
 print("EA: (Mew+Lambda)+2Opt \t\t{0}\t{1}".format(cost13, mark_optimal(cost1, cost13)))
 print("Genetic Algorithm \t\t{0}\t{1}".format(cost14, mark_optimal(cost1, cost14)))
+print("Elitist GA \t\t\t{0}\t{1}".format(cost15, mark_optimal(cost1, cost15)))
+print("Elitist GA+2Opt \t\t{0}\t{1}".format(cost16, mark_optimal(cost1, cost16)))
 print("\n*Optimal")
