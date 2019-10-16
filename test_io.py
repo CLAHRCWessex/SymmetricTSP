@@ -83,7 +83,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 70 #note bruteforce is slow beyond 10
+size_trim = 9 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -95,7 +95,7 @@ print("initial cost: {0}".format(o.tour_cost(tour, matrix)))
 solver = BruteForceSolver(tour, matrix)
 print("Enumerating...")
 #for size_trim 10 = 2.2s per loop
-#solver.solve()
+solver.solve()
 
 print("\n** BRUTEFORCE OUTPUT ***")
 print_output(solver)
