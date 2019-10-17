@@ -92,6 +92,19 @@ class TournamentSelector(AbstractSelector):
         '''
         Select individual from population for breeding using
         a tournament approach.  t tournaments are conducted.
+
+        Parameters:
+        ---------
+        population -    numpy.array.  Matrix of chromosomes 
+        fitness -       numpy.array, vector of floats representing the
+                        fitness of individual chromosomes
+
+        Returns:
+        --------
+        numpy.array, vector (1D array) representing the chromosome
+        that won the tournament.
+
+
         '''
         best_index = np.random.randint(0, population.shape[0])
         best, best_fitness = population[best_index], fitness[best_index]

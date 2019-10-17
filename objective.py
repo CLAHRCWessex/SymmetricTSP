@@ -3,6 +3,7 @@
 Encapsulates objective functions for TSP
 """
 
+from abc import ABC, abstractmethod
 import numpy as np
 
 def symmetric_tour_list(n_cities, start_index = 0):
@@ -32,4 +33,50 @@ def tour_cost(tour, matrix):
         cost += matrix[tour[i]][tour[i+1]]
         
     return cost
+
+
+class AbstractObjective(ABC):   
+    @abstractmethod
+    def evaluate(self, solution):
+        pass
+
+
+class SimpleTSPObjective(AbstractObjective):
+    '''
+    Simple objective for the Symmetric TSP
+    Evaluates the cost of a tour.
+    '''
+    def __init__(self, matrix):
+        '''
+        Constructor
+
+        Parameters:
+        -------
+        matrix - numpy.array, matrix (2D array) representing the 
+        edge costs between each city.
+        '''
+        self._matrix = matrix
     
+    def evaluate(self, tour):
+        """
+        The eucidean total distance in the tour.
+        
+        Parameters: 
+        --------
+        tour -  numpy.array, vector (1D array) representing tour
+                e.g. [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        Returns:
+        -------
+        float - cost of tour.  This is the euclidean difference between each
+        city in @tour with the addition of looping back from the final city to the 
+        first.
+
+        """
+        cost = 0.0
+        for i in range(len(tour) - 1):
+            cost += self._matrix[tour[i]][tour[i+1]]
+
+        cost += self._matrix[tour[len(tour)-1]][tour[0]]
+            
+        return cost

@@ -44,8 +44,6 @@ class MultiRunner(object):
         return self.costs[self.best_indexs[0]], [self.solutions[x] for x in self.best_indexs]
 
 
-
-
 class ILSPertubation(ABC):
     @abstractmethod
     def perturb(self, tour):
@@ -64,7 +62,7 @@ class HigherQualityHomeBase(ILSHomeBaseAcceptanceLogic):
     '''
 
     def new_home_base(self, home_base, home_cost, candidate, candidate_cost):
-        if candidate_cost > home_cost
+        if candidate_cost > home_cost:
             return candidate, candidate_cost
         else:
             return home_base, home_cost
@@ -119,19 +117,10 @@ class DoubleBridgePertubation(ILSPertubation):
         return np.concatenate((p1, p2, p1[0]), axis=None)
 
 
-if __name__ == '__main__':
-    p = DoubleBridgePertubation()
-
-    tour = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-
-    result = p.perturb(tour)
-
-    print(result)
-
 
 class IteratedLocalSearch(object):
     
-    def __init__(self, local_search, accept=None, perturb=None):
+    def __init__(self, objective, local_search, accept=None, perturb=None, maximisation=True):
         '''
         Constructor Method
 
@@ -141,6 +130,7 @@ class IteratedLocalSearch(object):
         perturb -- ILSPertubation, conatins logic for pertubation from the local optimimum in each iteration
 
         '''
+        self._objective = objective
         self._local_search = local_search
         if accept == None:
             self._accepter = RandomHomeBase()
@@ -148,13 +138,20 @@ class IteratedLocalSearch(object):
             self._accepter = accept
 
         if perturb == None:
-            self._perturb = DoubleBridgePertubation()
+            self._perturber = DoubleBridgePertubation()
         else:
             self._perturber = perturb
+
+        if maximisation:
+            self._negate = 1
+        elif not maximisation:
+            self._negate = -1
+        else:
+            raise ValueError('maximisation must be of type bool (True|False) ')
             
         self._solutions = []
-        self.costs = []
-        self.best_indexs = []
+        self._best_cost = np.inf * self._negate
+        
         
     def run(self, n):
         """
@@ -165,51 +162,41 @@ class IteratedLocalSearch(object):
 
         """
 
-        current = random_tour(self.solver.solution)
+        current = self._local_search.solution
+        np.random.shuffle(current) # random tour
+        
         home_base = current
-        self._solutions[current]
-        best = current
-        best_cost = np.inf
-        self._negate = -1
-
+        home_base_cost = self._objective.evaluate(current) * self._negate
+        self._best_cost = home_base_cost 
+        self._solutions.append(current)
+                
         for x in range(n):
 
             #Hill climb from new starting point
             self._local_search.set_init_solution(current)
             self._local_search.solve()
+            current = self._local_search.best_solutions[0]
+
             #will need to refactor 2Opt search from decent to ascent....maybe...
             iteration_best_cost = self._local_search.best_cost * self._negate
 
-            if iteration_best_cost > best_cost:
-                best_cost = iteration_best_cost
+            if iteration_best_cost > self._best_cost:
+                self._best_cost = iteration_best_cost
                 self._solutions = self._local_search.best_solutions
 
-            elif iteration_best_cost == best_cost:
+            elif iteration_best_cost == self._best_cost:
                 self._solutions.append(self._local_search.best_solutions)
                 [self._solutions.append(i) for i in self._local_search.best_solutions]
 
-
+            home_base, home_base_cost = self._accepter.new_home_base(home_base, home_base_cost, 
+                                                     current, iteration_best_cost)
+            current = self._perturber.perturb(home_base)
             
-            current = self._pertuber.perturb(home_base)
-
-
-            
-            #print(self.solver.best_cost)
-            
-        self.save_best_solution()
-    
-
-
-    def new_home_base(home_base, current):
-        pass
-
-    
-    def save_best_solution(self):
-        bcost = min(self.costs)
-        self.best_indexs = [i for i,x in enumerate(self.costs) if x == bcost]
         
     def get_best_solutions(self):
-        return self.costs[self.best_indexs[0]], [self._solutions[x] for x in self.best_indexs]
+        return self._best_cost * self._negate, self._solutions
+
+  
             
             
             
