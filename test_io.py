@@ -10,7 +10,7 @@ import init_solutions as init
 from objective import SimpleTSPObjective
 from bruteforce import BruteForceSolver, RandomSearch
 from local_search import OrdinaryDecent, SteepestDecent
-from multi_runner import MultiRunner, IteratedLocalSearch, HigherQualityHomeBase
+from random_restarts import MultiRunner, IteratedLocalSearch, HigherQualityHomeBase
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs, OrdinaryDecent2OptNew
 from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
