@@ -107,9 +107,13 @@ class DoubleBridgePertubation(ILSPertubation):
         '''
 
         n = len(tour)
-        pos1 = np.random.randint(1, int(n/4)+1) 
-        pos2 = pos1 + np.random.randint(1, int(n/4)+1) 
-        pos3 = pos2 + np.random.randint(1, int(n/4)+1) 
+        end = int(n/4)+1
+        end = int(n/3)+1
+        pos1 = np.random.randint(1, end) 
+        pos2 = pos1 + np.random.randint(1, end) 
+        pos3 = pos2 + np.random.randint(1, end) 
+
+        #print(tour[:pos1], tour[pos1:pos2], tour[pos2:pos3], tour[pos3:])
 
         p1 = np.concatenate((tour[:pos1] , tour[pos3:]), axis=None)
         p2 = np.concatenate((tour[pos2:pos3] , tour[pos1:pos2]), axis=None)
@@ -117,6 +121,10 @@ class DoubleBridgePertubation(ILSPertubation):
         return np.concatenate((p1, p2, p1[0]), axis=None)
 
 
+if __name__ == '__main__':
+    tour = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    d = DoubleBridgePertubation()
+    d.perturb(tour)
 
 class IteratedLocalSearch(object):
     

@@ -80,3 +80,4 @@ class SimpleTSPObjective(AbstractObjective):
         cost += self._matrix[tour[len(tour)-1]][tour[0]]
             
         return cost
+

@@ -10,7 +10,7 @@ import init_solutions as init
 from objective import SimpleTSPObjective
 from bruteforce import BruteForceSolver, RandomSearch
 from local_search import OrdinaryDecent, SteepestDecent
-from multi_runner import MultiRunner, IteratedLocalSearch
+from multi_runner import MultiRunner, IteratedLocalSearch, HigherQualityHomeBase
 from local_search_2opt import OrdinaryDecent2Opt, SteepestDecent2Opt, LocalSearchArgs, OrdinaryDecent2OptNew
 from construction import NearestNeighbour, FurthestInsertion
 from evolutionary import (EvolutionaryAlgorithm, MewLambdaEvolutionStrategy, 
@@ -84,7 +84,7 @@ print(cost)
 #Brute force example for small TSP problems
 
 #need somethign to produce "short tour from large".
-size_trim = 8 #note bruteforce is slow beyond 10
+size_trim = 70 #note bruteforce is slow beyond 10
 base_city = tour[0]
 tour = tour[0:size_trim]  #select a subset of the big problem.
 tour.append(base_city)
@@ -96,7 +96,7 @@ print("initial cost: {0}".format(o.tour_cost(tour, matrix)))
 solver = BruteForceSolver(tour, matrix)
 print("Enumerating...")
 #for size_trim 10 = 2.2s per loop
-solver.solve()
+#solver.solve()
 
 print("\n** BRUTEFORCE OUTPUT ***")
 print_output(solver)
@@ -213,7 +213,7 @@ args = LocalSearchArgs()
 args.init_solution = tour
 args.matrix = matrix
 runner = MultiRunner(OrdinaryDecent2Opt(args))
-n = 50
+n = 100
 print("\nRunning Local Search using Ordinary Decent 2-Opt (Best of {} runs)..."\
       .format(n))
 runner.run(n)
@@ -241,7 +241,7 @@ _lambda = 200
 
 strategy = MewLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=500)
 print("\nRunning (mew, lambda) evolutionary alg...")
 solver.solve()
 
@@ -257,7 +257,7 @@ mew = 10
 _lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoCityMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=500)
 print("\nRunning (mew + lambda) evolutionary alg...")
 solver.solve()
 
@@ -273,7 +273,7 @@ mew = 10
 _lambda = 200
 strategy = MewPlusLambdaEvolutionStrategy(mew, _lambda, TwoOptMutator())
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=500)
 print("\nRunning (mew + lambda) evolutionary alg with 2-Opt...")
 solver.solve()
 
@@ -292,7 +292,7 @@ strategy = GeneticAlgorithmStrategy(_lambda,
                                     mutator=TwoCityMutator())
 
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=500)
 print("\nRunning Genetic Algorithm")
 solver.solve()
 
@@ -313,7 +313,7 @@ strategy = ElitistGeneticAlgorithmStrategy(mew, _lambda,
                                            mutator=TwoCityMutator())
 
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=500)
 print("\nRunning Elitist Genetic Algorithm")
 solver.solve()
 
@@ -334,7 +334,7 @@ strategy = ElitistGeneticAlgorithmStrategy(mew, _lambda,
                                            mutator=TwoOptMutator())
 
 solver = EvolutionaryAlgorithm(tour, matrix,_lambda, strategy, 
-                               maximisation=False, generations=1000)
+                               maximisation=False, generations=500)
 print("\nRunning Elitist Genetic Algorithm - 2Opt")
 solver.solve()
 
@@ -349,14 +349,35 @@ print(solver.best_solution)
 objective = SimpleTSPObjective(matrix)
 local_search = OrdinaryDecent2OptNew(objective, tour)
 runner = IteratedLocalSearch(objective, local_search, maximisation=False)
-n = 50
+n = 20
 print("\nRunning Iterated Local Search using Ordinary Decent 2-Opt ({} runs)..."\
       .format(n))
 runner.run(n)
 
-print("\n** MULTIPLE RUNS OF ORDINARY DECENT OUTPUT ***")
-print_multi_run(local_search)
+print("\n** ILS OUTPUT ***")
+print("best cost:\t{0}".format(runner._best_cost))
+print("best solutions:")
+print(runner._solutions)
 cost17, solutions = runner.get_best_solutions()
+
+
+#Iterated Local Search - multiple runs of Ordinary Decent 2Opt. 
+#accept new home base when better only
+objective = SimpleTSPObjective(matrix)
+local_search = OrdinaryDecent2OptNew(objective, tour)
+runner = IteratedLocalSearch(objective, local_search, accept=HigherQualityHomeBase(), 
+                             maximisation=False)
+n = 20
+print("\nRunning ILS, HQHombase, OD 2-Opt ({} runs)..."\
+      .format(n))
+runner.run(n)
+
+print("\n** ILS OUTPUT ***")
+print("best cost:\t{0}".format(runner._best_cost))
+print("best solutions:")
+print(runner._solutions)
+cost18, solutions = runner.get_best_solutions()
+
 
 #Summary of methods
 print("\n** COST SUMMARY ***")
@@ -380,5 +401,6 @@ print("EA: (Mew+Lambda)+2Opt \t\t{0}\t{1}".format(cost13, mark_optimal(cost1, co
 print("Genetic Algorithm \t\t{0}\t{1}".format(cost14, mark_optimal(cost1, cost14)))
 print("Elitist GA \t\t\t{0}\t{1}".format(cost15, mark_optimal(cost1, cost15)))
 print("Elitist GA+2Opt \t\t{0}\t{1}".format(cost16, mark_optimal(cost1, cost16)))
-print("ILS. Random Homebase \t\t{0}\t{1}".format(cost17, mark_optimal(cost1, cost17)))
+print("ILS. Homebase=Rand Walk\t\t{0}\t{1}".format(cost17, mark_optimal(cost1, cost17)))
+print("ILS. Homebase=best local optimum \t\t{0}\t{1}".format(cost18, mark_optimal(cost1, cost17)))
 print("\n*Optimal")
